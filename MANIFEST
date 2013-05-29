@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+pHash.xs
+ppport.h
+README
+t/Image-pHash.t
+lib/Image/pHash.pm

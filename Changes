@@ -1,0 +1,6 @@
+Revision history for Perl extension Image::pHash.
+
+0.01  Wed May 29 19:31:02 2013
+	- original version; created by h2xs 1.23 with options
+		-n Image::pHash -A
+

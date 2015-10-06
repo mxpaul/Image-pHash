@@ -134,54 +134,63 @@ namespace image_reader {
 
 		// Read pixel data
 		if (color_type != PNG_COLOR_TYPE_RGB && color_type != PNG_COLOR_TYPE_RGB_ALPHA) {
-			png_destroy_read_struct(&png_ptr, &end_info, (png_infopp) NULL);
+			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 		}
 		
 		CImg<T> *cimgData = new CImg<T>;
 		
-		const bool is_alpha = (color_type == PNG_COLOR_TYPE_RGBA);
-		cimgData->assign(W, H, 1, (is_gray ? 1 : 3) + (is_alpha ? 1 : 0));
-		T
-		  *ptr_r = cimgData->data(0,0,0,0),
-		  *ptr_g = is_gray?0:cimgData->data(0,0,0,1),
-		  *ptr_b = is_gray?0:cimgData->data(0,0,0,2),
-		  *ptr_a = !is_alpha?0:cimgData->data(0,0,0,is_gray?1:3);
-		  
-		switch (bit_depth) {
-		case 8 : {
-			cimg_forY(*cimgData,y) {
-				const unsigned char *ptrs = (unsigned char*)imgData[y];
-				cimg_forX(*cimgData,x) {
-					*(ptr_r++) = (T)*(ptrs++);
-					if (ptr_g) *(ptr_g++) = (T)*(ptrs++); else ++ptrs;
-					if (ptr_b) *(ptr_b++) = (T)*(ptrs++); else ++ptrs;
-					if (ptr_a) *(ptr_a++) = (T)*(ptrs++); else ++ptrs;
+		try {
+			const bool is_alpha = (color_type == PNG_COLOR_TYPE_RGBA);
+			cimgData->assign(W, H, 1, (is_gray ? 1 : 3) + (is_alpha ? 1 : 0));
+			T
+			  *ptr_r = cimgData->data(0,0,0,0),
+			  *ptr_g = is_gray?0:cimgData->data(0,0,0,1),
+			  *ptr_b = is_gray?0:cimgData->data(0,0,0,2),
+			  *ptr_a = !is_alpha?0:cimgData->data(0,0,0,is_gray?1:3);
+			  
+			switch (bit_depth) {
+			case 8 : {
+				cimg_forY(*cimgData,y) {
+					const unsigned char *ptrs = (unsigned char*)imgData[y];
+					cimg_forX(*cimgData,x) {
+						*(ptr_r++) = (T)*(ptrs++);
+						if (ptr_g) *(ptr_g++) = (T)*(ptrs++); else ++ptrs;
+						if (ptr_b) *(ptr_b++) = (T)*(ptrs++); else ++ptrs;
+						if (ptr_a) *(ptr_a++) = (T)*(ptrs++); else ++ptrs;
+					}
 				}
+				break;
 			}
-			break;
-		}
-		case 16 : {
-			cimg_forY(*cimgData,y) {
-				const unsigned short *ptrs = (unsigned short*)(imgData[y]);
-				if (!cimg::endianness()) cimg::invert_endianness(ptrs,4*W);
-				cimg_forX(*cimgData,x) {
-					*(ptr_r++) = (T)*(ptrs++);
-					if (ptr_g) *(ptr_g++) = (T)*(ptrs++); else ++ptrs;
-					if (ptr_b) *(ptr_b++) = (T)*(ptrs++); else ++ptrs;
-					if (ptr_a) *(ptr_a++) = (T)*(ptrs++); else ++ptrs;
+			case 16 : {
+				cimg_forY(*cimgData,y) {
+					const unsigned short *ptrs = (unsigned short*)(imgData[y]);
+					if (!cimg::endianness()) cimg::invert_endianness(ptrs,4*W);
+					cimg_forX(*cimgData,x) {
+						*(ptr_r++) = (T)*(ptrs++);
+						if (ptr_g) *(ptr_g++) = (T)*(ptrs++); else ++ptrs;
+						if (ptr_b) *(ptr_b++) = (T)*(ptrs++); else ++ptrs;
+						if (ptr_a) *(ptr_a++) = (T)*(ptrs++); else ++ptrs;
+					}
 				}
+				break;
 			}
-			break;
-		}
-		
-		}
-		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+			
+			}
+			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 
-		// Deallocate Image Read Memory
-		cimg_forY(*cimgData,n) delete[] imgData[n];
-		delete[] imgData;
-		
-		return cimgData;
+			// Deallocate Image Read Memory
+			cimg_forY(*cimgData,n) delete[] imgData[n];
+			delete[] imgData;
+			
+			return cimgData;
+		} catch (...) {
+			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+			delete cimgData;
+			cimg_forY(*cimgData,n) delete[] imgData[n];
+			delete[] imgData;
+			
+			throw;
+		}
 #else
 		return NULL;
 #endif

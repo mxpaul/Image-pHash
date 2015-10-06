@@ -19,7 +19,9 @@ extern "C" {
 
 #define PNG_SKIP_SETJMP_CHECK
 #include "CImg.h"
+#include "readers/image_reader.h"
 using namespace cimg_library;
+using namespace image_reader;
 
 /*
 #include <limits.h>
@@ -55,17 +57,7 @@ CImg<float>* ph_dct_matrix(const int N){
 	return ptr_matrix;
 }
 
-int ph_dct_imagehash(const char* file,ulong64 &hash){
-
-	if (!file){
-		return -1;
-	}
-	CImg<uint8_t> src;
-	try {
-		src.load(file);
-	} catch (CImgIOException ex){
-		return -1;
-	}
+int ph_dct_imagehash(CImg<uint8_t> &src,ulong64 &hash){
 	CImg<float> meanfilter(7,7,1,1,1);
 	CImg<float> img;
 	if (src.spectrum() == 3){
@@ -102,6 +94,36 @@ int ph_dct_imagehash(const char* file,ulong64 &hash){
 	return 0;
 }
 
+int ph_dct_imagehash(const char* file, ulong64 &hash){
+	if (!file){
+		return -1;
+	}
+	CImg<uint8_t> src;
+	try {
+		src.load(file);
+	} catch (CImgIOException ex){
+		return -1;
+	}
+	// warn("fromFile: %d %d %d %d", src.width(), src.height(), src.depth(), src.spectrum());
+	return ph_dct_imagehash(src, hash);
+}
+
+int ph_dct_imagehash(const char* const buffer, unsigned int size, ulong64 &hash){
+	if (buffer == NULL){
+		return -1;
+	}
+	
+	CImg<uint8_t> *src = read_image<uint8_t>(buffer, size);
+	
+	if (src == NULL) {
+		return -1;
+	}
+	
+	int h = ph_dct_imagehash(*src, hash);
+	delete src;
+	return h;
+}
+
 int ph_hamming_distance(const ulong64 hash1,const ulong64 hash2){
 	ulong64 x = hash1^hash2;
 	const ulong64 m1  = 0x5555555555555555ULL;
@@ -132,12 +154,7 @@ CImg<float>* GetMHKernel(float alpha, float level){
 	return pkernel;
 }
 
-uint8_t* ph_mh_imagehash(const char *filename, int &N,float alpha, float lvl){
-	if (filename == NULL){
-		return NULL;
-	}
-
-	CImg<uint8_t> src(filename);
+uint8_t* ph_mh_imagehash(CImg<uint8_t> &src, int &N,float alpha, float lvl){
 	CImg<uint8_t> img;
 
 	uint8_t *hash = (unsigned char*)malloc(72*sizeof(uint8_t));
@@ -190,6 +207,32 @@ uint8_t* ph_mh_imagehash(const char *filename, int &N,float alpha, float lvl){
 	return hash;
 }
 
+uint8_t* ph_mh_imagehash(const char *const buffer, unsigned int size, int &N, float alpha, float lvl){
+	
+	if (buffer == NULL){
+		return NULL;
+	}
+	
+	CImg<uint8_t> *src = read_image<uint8_t>(buffer, size);
+	
+	if (src == NULL) {
+		return NULL;
+	}
+	
+	uint8_t* h = ph_mh_imagehash(*src, N, alpha, lvl);
+	delete src;
+	return h;
+}
+
+uint8_t* ph_mh_imagehash(const char *filename, int &N,float alpha, float lvl){
+	if (filename == NULL){
+		return NULL;
+	}
+	
+	CImg<uint8_t> src(filename);
+	return ph_mh_imagehash(src, N, alpha, lvl);
+}
+
 int ph_bitcount8(uint8_t val){
 	int num = 0;
 	while (val){
@@ -230,6 +273,38 @@ hash(path)
 
 		try {
 			x = ph_dct_imagehash(path, hash);
+		}
+		catch( char * e ) {
+			croak("Exception while ...: %s", e);
+		}
+		catch ( ... ) {
+			croak("Exception while ...");
+		}
+		
+		//printf("x = %d h = %llu\n",x,hash);
+		if (x < 0) {
+			XSRETURN_UNDEF;
+		}
+		else {
+			ST(0) = sv_2mortal( newSVuv( hash ) );
+			XSRETURN(1);
+		}
+		
+SV*
+hash_mem(buffer)
+		SV *buffer;
+	PPCODE:
+		STRLEN na;
+		char *buf = (char*) SvPV(buffer, na);
+		unsigned int buf_len = (unsigned int) na;
+		
+		// warn("%p %d %d %d %d", buffer, SvIV(ST(1)), SvIV(ST(2)), SvIV(ST(3)), SvIV(ST(4)));
+		
+		ulong64 hash = 0;
+		int x = -1;
+
+		try {
+			x = ph_dct_imagehash(buf, buf_len, hash);
 		}
 		catch( char * e ) {
 			croak("Exception while ...: %s", e);
@@ -291,6 +366,48 @@ mh_hash(path, param_alpha, param_level)
 
 		try {
 			hash = (char*)ph_mh_imagehash(path, hashlen, alpha, level);
+		}
+		catch( char * e ) {
+			croak("Exception while ...: %s", e);
+			if ( hash ) {
+				free(hash);
+			}
+		}
+		catch ( ... ) {
+			croak("Exception while ...");
+			if ( hash ) {
+				free(hash);
+			}
+		}
+		
+		//printf("x = %d h = %llu\n",x,hash);
+		if (hash == NULL) {
+			XSRETURN_UNDEF;
+		}
+		else {
+			ST(0) = sv_2mortal( newSVpvn( hash ,hashlen) );
+			free(hash);
+			XSRETURN(1);
+		}
+		
+SV*
+mh_hash_mem(param_alpha, param_level, buffer)
+		double param_alpha;
+		double param_level;
+		SV *buffer;
+	PPCODE:
+		int hashlen = 0;
+		char *hash = NULL;
+		float alpha, level;
+		alpha = (float)( param_alpha );
+		level = (float)( param_level );
+		
+		STRLEN na;
+		char *buf = (char*) SvPV(buffer, na);
+		unsigned int size = (unsigned int) na;
+
+		try {
+			hash = (char*)ph_mh_imagehash(buf, size, hashlen, alpha, level);
 		}
 		catch( char * e ) {
 			croak("Exception while ...: %s", e);

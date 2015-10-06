@@ -10,7 +10,7 @@ WriteMakefile(
       (ABSTRACT_FROM  => 'lib/Image/pHash.pm', # retrieve abstract from module
        AUTHOR         => 'Vladimir Perepelitsa <v.perepelitsa@localdomain>') : ()),
     LIBS              => ['-ljpeg -lpng -lstdc++'], # e.g., '-lm'
-    DEFINE            => '-O2 -ffast-math -O3', # e.g., '-DHAVE_SOMETHING'
+    DEFINE            => '-O0 -ffast-math -O0', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
 	# Un-comment this if you add C files to link with later:
     # OBJECT            => '$(O_FILES)', # link all the C files too

@@ -6,6 +6,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 pHash.xs
 ppport.h
+readers/gif_reader.h
 readers/image_reader.h
 readers/jpeg_reader.h
 readers/png_reader.h

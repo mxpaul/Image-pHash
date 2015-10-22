@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "png_reader.h"
 #include "jpeg_reader.h"
+#include "gif_reader.h"
 
 using namespace cimg_library;
 
@@ -14,15 +15,18 @@ namespace image_reader {
 		if (buffer == NULL) {
 			return NULL;
 		}
-		// unsigned char *buf = (unsigned char *) buffer;
 		
 		if (_check_png(buffer, size)) {
 			return _read_png<T>(buffer, size);
-		} else if (_check_jpeg(buffer, size)) {
-			return _read_jpeg<T>(buffer, size);
-		} else {
-			return NULL;
 		}
+		if (_check_jpeg(buffer, size)) {
+			return _read_jpeg<T>(buffer, size);
+		}
+		if (_check_gif(buffer, size)) {
+			return _read_gif<T>(buffer, size);
+		}
+		
+		return NULL;
 		
 	}
 

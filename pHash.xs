@@ -108,7 +108,7 @@ int ph_dct_imagehash(const char* file, ulong64 &hash){
 	return ph_dct_imagehash(src, hash);
 }
 
-int ph_dct_imagehash(const char* const buffer, unsigned int size, ulong64 &hash){
+int ph_dct_imagehash(const char* const buffer, size_t size, ulong64 &hash) {
 	if (buffer == NULL){
 		return -1;
 	}
@@ -207,7 +207,7 @@ uint8_t* ph_mh_imagehash(CImg<uint8_t> &src, int &N,float alpha, float lvl){
 	return hash;
 }
 
-uint8_t* ph_mh_imagehash(const char *const buffer, unsigned int size, int &N, float alpha, float lvl){
+uint8_t* ph_mh_imagehash(const char *const buffer, size_t size, int &N, float alpha, float lvl){
 	
 	if (buffer == NULL){
 		return NULL;
@@ -296,7 +296,7 @@ hash_mem(buffer)
 	PPCODE:
 		STRLEN na;
 		char *buf = (char*) SvPV(buffer, na);
-		unsigned int buf_len = (unsigned int) na;
+		size_t buf_len = (size_t) na;
 		
 		// warn("%p %d %d %d %d", buffer, SvIV(ST(1)), SvIV(ST(2)), SvIV(ST(3)), SvIV(ST(4)));
 		
@@ -404,7 +404,7 @@ mh_hash_mem(param_alpha, param_level, buffer)
 		
 		STRLEN na;
 		char *buf = (char*) SvPV(buffer, na);
-		unsigned int size = (unsigned int) na;
+		size_t size = (size_t) na;
 
 		try {
 			hash = (char*)ph_mh_imagehash(buf, size, hashlen, alpha, level);

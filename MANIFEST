@@ -1,8 +1,19 @@
 Changes
+CImg.h
+lib/Image/pHash.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
+MANIFEST.SKIP
 pHash.xs
 ppport.h
+readers/image_reader.h
+readers/jpeg_reader.h
+readers/png_reader.h
 README
-t/Image-pHash.t
-lib/Image/pHash.pm
+t/00-load.t
+t/01-hash.t
+t/02-dist.t
+t/03-mh_hash.t
+t/04-mh_dist.t
+test_images/image.jpg
+test_images/image.png

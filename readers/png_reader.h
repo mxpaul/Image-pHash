@@ -8,12 +8,16 @@
 using namespace cimg_library;
 
 namespace image_reader {
-	static bool _check_png(unsigned char * buf) {
-		
+	static bool _check_png(const char* buffer, size_t size) {
 #ifdef cimg_use_png
+		if (size < 8) {
+			return false;
+		}
+		unsigned char* buf = (unsigned char*) buffer;
 		return !png_sig_cmp(buf, 0, 8);
-#endif
+#else
 		return false;
+#endif
 	}
 	
 #ifdef cimg_use_png
@@ -49,8 +53,9 @@ namespace image_reader {
 #endif
 	
 	template <typename T>
-	static CImg<T> *_read_png(unsigned char * buf, unsigned int size) {
+	static CImg<T> *_read_png(const char* buffer, size_t size) {
 #ifdef cimg_use_png
+		unsigned char* buf = (unsigned char*) buffer;
 		PngData pngData;
 		pngData.p = (png_bytep) (buf + 8);
 		pngData.len = (png_uint_32) size;

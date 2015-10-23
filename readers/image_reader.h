@@ -23,6 +23,7 @@ namespace image_reader {
 			return _read_jpeg<T>(buffer, size);
 		}
 		if (_check_gif(buffer, size)) {
+			warn("Got Gif!");
 			return _read_gif<T>(buffer, size);
 		}
 		

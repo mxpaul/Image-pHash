@@ -16,6 +16,7 @@ extern "C" {
 #define cimg_display 0
 #define cimg_use_png 1
 #define cimg_use_jpeg 1
+#define cimg_use_gif 1
 
 #define PNG_SKIP_SETJMP_CHECK
 #include "CImg.h"
@@ -63,9 +64,9 @@ int ph_dct_imagehash(CImg<uint8_t> &src,ulong64 &hash){
 	if (src.spectrum() == 3){
 		img = src.RGBtoYCbCr().channel(0).get_convolve(meanfilter);
 	} else if (src.spectrum() == 4){
-		int width = img.width();
-		int height = img.height();
-		int depth = img.depth();
+		int width = src.width();
+		int height = src.height();
+		int depth = src.depth();
 		img = src.crop(0,0,0,0,width-1,height-1,depth-1,2).RGBtoYCbCr().channel(0).get_convolve(meanfilter);
 	} else {
 		img = src.channel(0).get_convolve(meanfilter);
@@ -77,15 +78,16 @@ int ph_dct_imagehash(CImg<uint8_t> &src,ulong64 &hash){
 
 	CImg<float> dctImage = (*C)*img*Ctransp;
 
-	CImg<float> subsec = dctImage.crop(1,1,8,8).unroll('x');;
+	CImg<float> subsec = dctImage.crop(1,1,8,8).unroll('x');
 	
 	float median = subsec.median();
 	ulong64 one = 0x0000000000000001;
 	hash = 0x0000000000000000;
 	for (int i=0;i< 64;i++){
 		float current = subsec(i);
-		if (current > median)
+		if (current > median) {
 			hash |= one;
+		}
 		one = one << 1;
 	}
 	

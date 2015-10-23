@@ -3,7 +3,9 @@
 
 #include "CImg.h"
 #ifdef cimg_use_jpeg
+extern "C" {
 #include <jpeglib.h>
+}
 #endif
 using namespace cimg_library;
 

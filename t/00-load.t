@@ -5,6 +5,10 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
+use 5.010;
+use strict;
+use FindBin;
+use lib "t/lib","lib","$FindBin::Bin/../blib/lib","$FindBin::Bin/../blib/arch";
 use Test::More tests => 1;
 BEGIN { use_ok('Image::pHash') };
 

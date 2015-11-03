@@ -2,6 +2,7 @@
 #define _PNG_READER_H_
 
 #include "CImg.h"
+#include "../util/cwarn.h"
 #ifdef cimg_use_png
 extern "C" {
 #  include <png.h>
@@ -67,22 +68,26 @@ namespace image_reader {
 		png_error_ptr user_error_fn = 0, user_warning_fn = 0;
 		png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,user_error_ptr,user_error_fn,user_warning_fn);
 		if (!png_ptr) {
+			cwarn("Failed to initialize 'png_ptr' structure.");
 			return NULL;
 		}
 
 		png_infop info_ptr = png_create_info_struct(png_ptr);
 		if (!info_ptr) {
+			cwarn("Failed to initialize 'info_ptr' structure.");
 			png_destroy_read_struct(&png_ptr, (png_infopp) NULL, (png_infopp) NULL);
 			return NULL;
 		}
 
 		png_infop end_info = png_create_info_struct(png_ptr);
 		if (!end_info) {
+			cwarn("Failed to initialize 'end_info' structure.");
 			png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp) NULL);
 			return NULL;
 		}
 		
 		if (setjmp(png_jmpbuf(png_ptr))) {
+			cwarn("Encountered unknown fatal error in libpng");
 			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 			return NULL;
 		}
@@ -127,6 +132,7 @@ namespace image_reader {
 		
 		png_read_update_info(png_ptr,info_ptr);
 		if (bit_depth != 8 && bit_depth != 16) {
+			cwarn("Invalid bit depth %u in png file.", bit_depth);
 			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 			return NULL;
 		}
@@ -142,6 +148,7 @@ namespace image_reader {
 
 		// Read pixel data
 		if (color_type != PNG_COLOR_TYPE_RGB && color_type != PNG_COLOR_TYPE_RGB_ALPHA) {
+			cwarn("Invalid color coding type %u in file.", color_type);
 			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 			delete[] imgData;
 			return NULL;
@@ -202,6 +209,7 @@ namespace image_reader {
 			throw;
 		}
 #else
+		cwarn("libpng not found!");
 		return NULL;
 #endif
 	}

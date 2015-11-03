@@ -22,3 +22,4 @@ test_images/200_s.gif
 test_images/image.gif
 test_images/image.jpg
 test_images/image.png
+util/cwarn.h

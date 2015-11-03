@@ -21,6 +21,7 @@ extern "C" {
 #define PNG_SKIP_SETJMP_CHECK
 #include "CImg.h"
 #include "readers/image_reader.h"
+#include "util/cwarn.h"
 using namespace cimg_library;
 using namespace image_reader;
 
@@ -111,13 +112,10 @@ int ph_dct_imagehash(const char* file, ulong64 &hash){
 }
 
 int ph_dct_imagehash(const char* const buffer, size_t size, ulong64 &hash) {
-	if (buffer == NULL){
-		return -1;
-	}
-	
 	CImg<uint8_t> *src = read_image<uint8_t>(buffer, size);
 	
 	if (src == NULL) {
+		cwarn("Image couldn't be decoded from memory.");
 		return -1;
 	}
 	

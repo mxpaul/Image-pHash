@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include "CImg.h"
+#include "../util/cwarn.h"
 #ifdef cimg_use_gif
 extern "C" {
 #include <gif_lib.h>
@@ -71,17 +72,17 @@ namespace image_reader {
 		GifFileType *gif_file = DGifOpen(&gif, &gif_read);
 		int err = GifLastError();
 		if (err != 0) {
-			warn("Error while reading a gif image. Error = %d", err);
+			cwarn("Error while reading a gif image. Error = %d.", err);
 			return NULL;
 		}
 		
 		if (DGifSlurp(gif_file) == GIF_ERROR) {
-			warn("Error while reading a gif image. Error = %d", GifLastError());
+			cwarn("Error while reading a gif image. Error = %d", GifLastError());
 			return NULL;
 		}
 		
 		if (gif_file->ImageCount == 0) {
-			warn("No frames found in gif image");
+			cwarn("No frames found in gif image");
 			return NULL;
 		}
 		
@@ -123,7 +124,7 @@ namespace image_reader {
 		}
 		
 		if (!DGifCloseFile(gif_file)) {
-			warn("Error while closing a gif image. Error = %d", GifLastError());
+			cwarn("Error while closing a gif image. Error = %d", GifLastError());
 			delete cimgData;
 			return NULL;
 		}

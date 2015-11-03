@@ -5,6 +5,7 @@
 #include "png_reader.h"
 #include "jpeg_reader.h"
 #include "gif_reader.h"
+#include "../util/cwarn.h"
 
 using namespace cimg_library;
 
@@ -13,6 +14,7 @@ namespace image_reader {
 	template <typename T>
 	static CImg<T> *read_image(const char* buffer, size_t size) {
 		if (buffer == NULL) {
+			cwarn("No image buffer provided.");
 			return NULL;
 		}
 		
@@ -26,9 +28,8 @@ namespace image_reader {
 			return _read_gif<T>(buffer, size);
 		}
 		
-		warn("Format could not be decoded. Supported formats: [png, jpeg, gif]");
+		cwarn("Format could not be decoded. Supported formats: [png, jpeg, gif]");
 		return NULL;
-		
 	}
 
 	

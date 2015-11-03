@@ -2,6 +2,7 @@
 #define _JPEG_READER_H_
 
 #include "CImg.h"
+#include "../util/cwarn.h"
 #ifdef cimg_use_jpeg
 extern "C" {
 #include <jpeglib.h>
@@ -92,6 +93,7 @@ namespace image_reader {
 		jerr.original.error_exit = CImg<T>::_cimg_jpeg_error_exit;
 
 		if (setjmp(jerr.setjmp_buffer)) { // JPEG error
+			cwarn("Error message returned by libjpeg: %s.", jerr.message);
 			return NULL;
 		}
 
@@ -104,6 +106,7 @@ namespace image_reader {
 		jpeg_start_decompress(&cinfo);
 
 		if (cinfo.output_components!=1 && cinfo.output_components!=3 && cinfo.output_components!=4) {
+			cwarn("Failed to load JPEG data from file.");
 			return NULL;
 		}
 		CImg<unsigned char> buf(cinfo.output_width*cinfo.output_components);

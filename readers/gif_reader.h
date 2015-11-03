@@ -92,26 +92,43 @@ namespace image_reader {
 		int colors = gif_file->SColorMap->ColorCount;
 		int background = gif_file->SBackGroundColor;
 		
-		for (int i = 0; i < img->ExtensionBlockCount; ++i) {
-			warn("block[%d]; function = %d", i, img->ExtensionBlocks[i].Function);
-			for (int j = 0; j < img->ExtensionBlocks[i].ByteCount; ++j) {
-				warn("\t[%d] = %x", j, img->ExtensionBlocks[i].Bytes[j]);
+		// for (int i = 0; i < img->ExtensionBlockCount; ++i) {
+		// 	warn("block[%d]; function = %d", i, img->ExtensionBlocks[i].Function);
+		// 	for (int j = 0; j < img->ExtensionBlocks[i].ByteCount; ++j) {
+		// 		warn("\t[%d] = %x", j, img->ExtensionBlocks[i].Bytes[j]);
+		// 	}
+		// }
+		// warn("width = %d; height = %d; depth = %d; colors = %d; background = %d", width, height, depth, colors, background);
+		
+		CImg<T> *cimgData = new CImg<T>;
+		cimgData->assign(width, height, 1, 3);
+		
+		T *ptr_r = cimgData->_data,
+		  *ptr_g = cimgData->_data + 1UL * cimgData->_width * cimgData->_height,
+		  *ptr_b = cimgData->_data + 2UL * cimgData->_width * cimgData->_height;
+		
+		ColorMapObject* color_map = img->ImageDesc.ColorMap ? img->ImageDesc.ColorMap : gif_file->SColorMap;
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
+				unsigned char color_idx = img->RasterBits[y * width + x];
+				GifColorType& color_obj = color_map->Colors[color_idx];
+				GifByteType r = color_obj.Red;
+				GifByteType g = color_obj.Green;
+				GifByteType b = color_obj.Blue;
+				
+				*(ptr_r++) = (T) r;
+				*(ptr_g++) = (T) g;
+				*(ptr_b++) = (T) b;
 			}
 		}
-		warn("width = %d; height = %d; depth = %d; colors = %d; background = %d", width, height, depth, colors, background);
-		
-		
-		
-		
-		// CImg<T> *cimgData = new CImg<T>;
 		
 		if (!DGifCloseFile(gif_file)) {
 			warn("Error while closing a gif image. Error = %d", GifLastError());
-			// delete cimgData;
+			delete cimgData;
 			return NULL;
 		}
 		
-		return NULL;
+		return cimgData;
 		
 #else
 		return NULL;

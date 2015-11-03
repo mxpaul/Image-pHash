@@ -21,7 +21,7 @@ sub read_file {
 
 my $image_jpg_path = 'test_images/image.jpg';
 my $image_png_path = 'test_images/image.png';
-my $image_gif_path = 'test_images/1.gif';
+my $image_gif_path = 'test_images/image.gif';
 
 my $image_jpg = read_file($image_jpg_path);
 my $image_png = read_file($image_png_path);
@@ -37,10 +37,10 @@ is(Image::pHash::hash($image_png_path),
    "Got hash for a png test image"
 );
 
-# is(Image::pHash::hash($image_gif_path),
-#    8684972064746193870,
-#    "Got hash for a gif test image"
-# );
+is(Image::pHash::hash($image_gif_path),
+   16590245461654031411,
+   "Got hash for a gif test image"
+);
 
 is(Image::pHash::hash_mem($image_jpg),
    Image::pHash::hash($image_jpg_path),
@@ -52,10 +52,10 @@ is(Image::pHash::hash_mem($image_png),
    "Got hash for an in-memory png test image"
 );
 
-# is(Image::pHash::hash_mem($image_gif),
-#    Image::pHash::hash($image_gif_path),
-#    "Got hash for an in-memory gif test image"
-# );
+is(Image::pHash::hash_mem($image_gif),
+   Image::pHash::hash($image_gif_path),
+   "Got hash for an in-memory gif test image"
+);
 
 
 done_testing();

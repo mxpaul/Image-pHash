@@ -128,6 +128,7 @@ namespace image_reader {
 		png_read_update_info(png_ptr,info_ptr);
 		if (bit_depth != 8 && bit_depth != 16) {
 			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+			return NULL;
 		}
 		const int byte_depth = bit_depth >> 3;
 		
@@ -142,6 +143,8 @@ namespace image_reader {
 		// Read pixel data
 		if (color_type != PNG_COLOR_TYPE_RGB && color_type != PNG_COLOR_TYPE_RGB_ALPHA) {
 			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+			delete[] imgData;
+			return NULL;
 		}
 		
 		CImg<T> *cimgData = new CImg<T>;

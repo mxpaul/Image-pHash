@@ -23,10 +23,10 @@ namespace image_reader {
 			return _read_jpeg<T>(buffer, size);
 		}
 		if (_check_gif(buffer, size)) {
-			warn("Got Gif!");
 			return _read_gif<T>(buffer, size);
 		}
 		
+		warn("Format could not be decoded. Supported formats: [png, jpeg, gif]");
 		return NULL;
 		
 	}

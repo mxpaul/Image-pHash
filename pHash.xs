@@ -393,10 +393,10 @@ mh_hash(path, param_alpha, param_level)
 		}
 		
 SV*
-mh_hash_mem(param_alpha, param_level, buffer)
+mh_hash_mem(buffer, param_alpha, param_level)
+		SV *buffer;
 		double param_alpha;
 		double param_level;
-		SV *buffer;
 	PPCODE:
 		int hashlen = 0;
 		char *hash = NULL;

@@ -9,7 +9,7 @@ WriteMakefile(
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Image/pHash.pm', # retrieve abstract from module
        AUTHOR         => 'Vladimir Perepelitsa <v.perepelitsa@localdomain>') : ()),
-    LIBS              => ['-ljpeg -lpng -lgif -lstdc++'], # e.g., '-lm'
+    LIBS              => ['-ljpeg -lpng -lgif -lstdc++ -lX11'], # e.g., '-lm'
     DEFINE            => '-O0 -ffast-math -g', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
 	# Un-comment this if you add C files to link with later:

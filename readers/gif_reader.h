@@ -12,6 +12,14 @@ extern int GifError(void);
 extern char *GifErrorString(void);
 extern int GifLastError(void);
 
+#ifndef GRAPHICS_EXT_FUNC_CODE
+#  define GRAPHICS_EXT_FUNC_CODE    0xf9
+#endif
+
+#ifndef NO_TRANSPARENT_COLOR
+#  define NO_TRANSPARENT_COLOR	-1
+#endif
+
 #endif
 using namespace cimg_library;
 
@@ -86,41 +94,77 @@ namespace image_reader {
 			return NULL;
 		}
 		
-		SavedImage* img = &gif_file->SavedImages[0];
-		int width = img->ImageDesc.Width;
-		int height = img->ImageDesc.Height;
-		int depth = gif_file->SColorResolution;
-		int colors = gif_file->SColorMap->ColorCount;
-		int background = gif_file->SBackGroundColor;
-		
-		// for (int i = 0; i < img->ExtensionBlockCount; ++i) {
-		// 	warn("block[%d]; function = %d", i, img->ExtensionBlocks[i].Function);
-		// 	for (int j = 0; j < img->ExtensionBlocks[i].ByteCount; ++j) {
-		// 		warn("\t[%d] = %x", j, img->ExtensionBlocks[i].Bytes[j]);
-		// 	}
-		// }
-		// warn("width = %d; height = %d; depth = %d; colors = %d; background = %d", width, height, depth, colors, background);
-		
 		CImg<T> *cimgData = new CImg<T>;
-		cimgData->assign(width, height, 1, 3);
+		cimgData->assign();
 		
-		T *ptr_r = cimgData->_data,
-		  *ptr_g = cimgData->_data + 1UL * cimgData->_width * cimgData->_height,
-		  *ptr_b = cimgData->_data + 2UL * cimgData->_width * cimgData->_height;
-		
-		ColorMapObject* color_map = img->ImageDesc.ColorMap ? img->ImageDesc.ColorMap : gif_file->SColorMap;
-		for (int y = 0; y < height; ++y) {
-			for (int x = 0; x < width; ++x) {
-				unsigned char color_idx = img->RasterBits[y * width + x];
-				GifColorType& color_obj = color_map->Colors[color_idx];
-				GifByteType r = color_obj.Red;
-				GifByteType g = color_obj.Green;
-				GifByteType b = color_obj.Blue;
-				
-				*(ptr_r++) = (T) r;
-				*(ptr_g++) = (T) g;
-				*(ptr_b++) = (T) b;
+		for (int i = 0; i < gif_file->ImageCount; ++i) {
+			SavedImage* img = &gif_file->SavedImages[i];
+			int width = img->ImageDesc.Width;
+			int height = img->ImageDesc.Height;
+			int depth = gif_file->SColorResolution;
+			int colors = gif_file->SColorMap->ColorCount;
+			int background = gif_file->SBackGroundColor;
+			ColorMapObject* color_map = img->ImageDesc.ColorMap ? img->ImageDesc.ColorMap : gif_file->SColorMap;
+			
+			ExtensionBlock* gcb = NULL;
+			for (int i = 0; i < img->ExtensionBlockCount; ++i) {
+				// warn("block[%d]; function = %d", i, img->ExtensionBlocks[i].Function);
+				// for (int j = 0; j < img->ExtensionBlocks[i].ByteCount; ++j) {
+				// 	warn("\t[%d] = %x", j, img->ExtensionBlocks[i].Bytes[j]);
+				// }
+				if (img->ExtensionBlocks[i].Function == GRAPHICS_EXT_FUNC_CODE) {
+					gcb = &img->ExtensionBlocks[i];
+					break;
+				}
 			}
+			int transparent_color = NO_TRANSPARENT_COLOR;
+			bool is_alpha = gcb && (gcb->Bytes[0] & 0x01);
+			if (is_alpha) {
+				transparent_color = gcb->Bytes[3];
+			}
+			warn("width = %d; height = %d; depth = %d; colors = %d; background = %d; is_alpha = %d, transparent_color = %d", width, height, depth, colors, background, is_alpha, transparent_color);
+			
+			CImg<T> frame_img;
+			frame_img.assign(width, height, 1, 3 + (is_alpha?1:0));
+			
+			T *ptr_r = frame_img.data(0,0,0,0),
+			  *ptr_g = frame_img.data(0,0,0,1),
+			  *ptr_b = frame_img.data(0,0,0,2),
+			  *ptr_a = is_alpha ? frame_img.data(0,0,0,3) : 0;
+			
+			for (int y = 0; y < height; ++y) {
+				for (int x = 0; x < width; ++x) {
+					unsigned char color_idx = img->RasterBits[y * width + x];
+					GifColorType& color_obj = color_map->Colors[color_idx];
+					GifByteType r = color_obj.Red;
+					GifByteType g = color_obj.Green;
+					GifByteType b = color_obj.Blue;
+					GifByteType alpha = color_idx == (unsigned char) transparent_color ? 0x00 : 0xFF;
+					
+					switch (frame_img._spectrum) {
+					case 3: {
+						*(ptr_r++) = (T) r;
+						*(ptr_g++) = (T) g;
+						*(ptr_b++) = (T) b;
+						break;
+					}
+					case 4: {
+						*(ptr_r++) = (T) r;
+						*(ptr_g++) = (T) g;
+						*(ptr_b++) = (T) b;
+						if (ptr_a) {
+							*(ptr_a++) = (T) alpha;
+						}
+						break;
+					}
+					}
+				}
+			}
+			
+			if (frame_img) {
+				frame_img.move_to(*cimgData);
+			}
+			
 		}
 		
 		if (!DGifCloseFile(gif_file)) {

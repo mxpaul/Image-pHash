@@ -5,27 +5,15 @@ use lib "t/lib","lib","$FindBin::Bin/../blib/lib","$FindBin::Bin/../blib/arch";
 use Image::pHash;
 use Data::Dumper;
 use Test::More;
-
-sub read_file {
-	my $filename = shift;
-	my $f = do {
-		local $/ = undef;
-		open FILE, $filename or die "Couldn't open file: $!";
-		binmode FILE;
-		my $file = <FILE>;
-		close FILE;
-		$file;
-	};
-	return $f;
-}
+use util;
 
 my $image_jpg_path = 'test_images/image.jpg';
 my $image_png_path = 'test_images/image.png';
 my $image_gif_path = 'test_images/image.gif';
+my @gif_images = ('test_images/image.gif', 'test_images/1.gif', 'test_images/2.gif', 'test_images/200_s.gif');
 
-my $image_jpg = read_file($image_jpg_path);
-my $image_png = read_file($image_png_path);
-my $image_gif = read_file($image_gif_path);
+my $image_jpg = util::read_file($image_jpg_path);
+my $image_png = util::read_file($image_png_path);
 
 is(Image::pHash::hash($image_jpg_path),
    7128083241579100457,
@@ -52,10 +40,12 @@ is(Image::pHash::hash_mem($image_png),
    "Got hash for an in-memory png test image"
 );
 
-is(Image::pHash::hash_mem($image_gif),
-   Image::pHash::hash($image_gif_path),
-   "Got hash for an in-memory gif test image"
-);
+for my $gif_image (@gif_images) {
+   is(Image::pHash::hash_mem(util::read_file($gif_image)),
+      Image::pHash::hash($gif_image),
+      "Got hash for an in-memory gif test image [$gif_image]"
+   );
+}
 
 
 done_testing();

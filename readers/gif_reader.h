@@ -97,71 +97,78 @@ namespace image_reader {
 		CImgList<T> cimgList;
 		cimgList.assign();
 		
-		for (int i = 0; i < gif_file->ImageCount; ++i) {
-			SavedImage* img = &gif_file->SavedImages[i];
-			int width = img->ImageDesc.Width;
-			int height = img->ImageDesc.Height;
-			int depth = gif_file->SColorResolution;
-			int colors = gif_file->SColorMap->ColorCount;
-			int background = gif_file->SBackGroundColor;
-			ColorMapObject* color_map = img->ImageDesc.ColorMap ? img->ImageDesc.ColorMap : gif_file->SColorMap;
-			
-			ExtensionBlock* gcb = NULL;
-			for (int i = 0; i < img->ExtensionBlockCount; ++i) {
-				if (img->ExtensionBlocks[i].Function == GRAPHICS_EXT_FUNC_CODE) {
-					gcb = &img->ExtensionBlocks[i];
-					break;
-				}
-			}
-			int transparent_color = NO_TRANSPARENT_COLOR;
-			bool is_alpha = gcb && (gcb->Bytes[0] & 0x01);
-			if (is_alpha) {
-				transparent_color = gcb->Bytes[3];
-			}
-			// cwarn("width = %d; height = %d; depth = %d; colors = %d; background = %d; is_alpha = %d, transparent_color = %d", width, height, depth, colors, background, is_alpha, transparent_color);
-			
-			CImg<T> frame_img;
-			frame_img.assign(width, height, 1, 3 + (is_alpha?1:0));
-			
-			T *ptr_r = frame_img.data(0,0,0,0),
-			  *ptr_g = frame_img.data(0,0,0,1),
-			  *ptr_b = frame_img.data(0,0,0,2),
-			  *ptr_a = is_alpha ? frame_img.data(0,0,0,3) : 0;
-			
-			for (int y = 0; y < height; ++y) {
-				for (int x = 0; x < width; ++x) {
-					unsigned char color_idx = img->RasterBits[y * width + x];
-					GifColorType& color_obj = color_map->Colors[color_idx];
-					GifByteType r = color_obj.Red;
-					GifByteType g = color_obj.Green;
-					GifByteType b = color_obj.Blue;
-					GifByteType alpha = color_idx == (unsigned char) transparent_color ? 0x00 : 0xFF;
-					
-					switch (frame_img._spectrum) {
-					case 3: {
-						*(ptr_r++) = (T) r;
-						*(ptr_g++) = (T) g;
-						*(ptr_b++) = (T) b;
+		try {
+			for (int i = 0; i < gif_file->ImageCount; ++i) {
+				SavedImage* img = &gif_file->SavedImages[i];
+				int width = img->ImageDesc.Width;
+				int height = img->ImageDesc.Height;
+				int depth = gif_file->SColorResolution;
+				int colors = gif_file->SColorMap->ColorCount;
+				int background = gif_file->SBackGroundColor;
+				ColorMapObject* color_map = img->ImageDesc.ColorMap ? img->ImageDesc.ColorMap : gif_file->SColorMap;
+				
+				ExtensionBlock* gcb = NULL;
+				for (int i = 0; i < img->ExtensionBlockCount; ++i) {
+					if (img->ExtensionBlocks[i].Function == GRAPHICS_EXT_FUNC_CODE) {
+						gcb = &img->ExtensionBlocks[i];
 						break;
 					}
-					case 4: {
-						*(ptr_r++) = (T) r;
-						*(ptr_g++) = (T) g;
-						*(ptr_b++) = (T) b;
-						if (ptr_a) {
-							*(ptr_a++) = (T) alpha;
+				}
+				int transparent_color = NO_TRANSPARENT_COLOR;
+				bool is_alpha = gcb && (gcb->Bytes[0] & 0x01);
+				if (is_alpha) {
+					transparent_color = gcb->Bytes[3];
+				}
+				// cwarn("width = %d; height = %d; depth = %d; colors = %d; background = %d; is_alpha = %d, transparent_color = %d", width, height, depth, colors, background, is_alpha, transparent_color);
+				
+				CImg<T> frame_img;
+				frame_img.assign(width, height, 1, 3 + (is_alpha?1:0));
+				
+				T *ptr_r = frame_img.data(0,0,0,0),
+				  *ptr_g = frame_img.data(0,0,0,1),
+				  *ptr_b = frame_img.data(0,0,0,2),
+				  *ptr_a = is_alpha ? frame_img.data(0,0,0,3) : 0;
+				
+				for (int y = 0; y < height; ++y) {
+					for (int x = 0; x < width; ++x) {
+						unsigned char color_idx = img->RasterBits[y * width + x];
+						GifColorType& color_obj = color_map->Colors[color_idx];
+						GifByteType r = color_obj.Red;
+						GifByteType g = color_obj.Green;
+						GifByteType b = color_obj.Blue;
+						GifByteType alpha = color_idx == (unsigned char) transparent_color ? 0x00 : 0xFF;
+						
+						switch (frame_img._spectrum) {
+						case 3: {
+							*(ptr_r++) = (T) r;
+							*(ptr_g++) = (T) g;
+							*(ptr_b++) = (T) b;
+							break;
 						}
-						break;
-					}
+						case 4: {
+							*(ptr_r++) = (T) r;
+							*(ptr_g++) = (T) g;
+							*(ptr_b++) = (T) b;
+							if (ptr_a) {
+								*(ptr_a++) = (T) alpha;
+							}
+							break;
+						}
+						}
 					}
 				}
+				
+				if (frame_img) {
+					frame_img.move_to(cimgList);
+				}
+				
+			}
+		} catch (...) {
+			if (!DGifCloseFile(gif_file)) {
+				cwarn("Error while closing a gif image. Error = %d", GifLastError());
 			}
 			
-			if (frame_img) {
-				frame_img.move_to(cimgList);
-				// cimgData->display();
-			}
-			
+			throw;
 		}
 		
 		if (!DGifCloseFile(gif_file)) {

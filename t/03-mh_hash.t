@@ -7,6 +7,8 @@ use Test::More;
 use Image::pHash;
 use util;
 
+my @gif_images = ('test_images/image.gif', 'test_images/1.gif', 'test_images/2.gif', 'test_images/200_s.gif');
+
 # is(unpack('H*',Image::pHash::mh_hash('test_images/image.jpg', 1, 2)),
 #    '3701000000001a49a5204344802cf45d4afc000047c0d6a5b9c362070e5d0cfc96c806ac76493596e05cd907a0934d1661d90b4c440025cab207b600024c22b4a5dc1fa047ec013f',
 #    "Got hash for a jpg test image"
@@ -33,9 +35,7 @@ is(unpack('H*',Image::pHash::mh_hash('test_images/image.gif', 1, 2)),
    '00000000000810000000000000029bbc00000000001b70ddb40000000000091bb36c00000000001fe71f6c000000000013204c0400000000000dda2680000000000933357b4c4800',
    "Got hash for a gif test image"
 );
-
-
-
+	
 is(unpack('H*', Image::pHash::mh_hash(\util::read_file('test_images/image.png'), 1, 2)),
 	unpack('H*',Image::pHash::mh_hash('test_images/image.png', 1, 2)),
 	"Got hash for a png test image (in-memory)"
@@ -46,9 +46,11 @@ is(unpack('H*', Image::pHash::mh_hash(\util::read_file('test_images/image.jpg'),
 	"Got hash for a jpeg test image (in-memory)"
 );
 
-is(unpack('H*', Image::pHash::mh_hash(\util::read_file('test_images/1.gif'), 1, 2)),
-	unpack('H*',Image::pHash::mh_hash('test_images/1.gif', 1, 2)),
-	"Got hash for a gif test image (in-memory)"
-);
+for my $gif_image (@gif_images) {
+	is(unpack('H*', Image::pHash::mh_hash(\util::read_file($gif_image), 1, 2)),
+		unpack('H*',Image::pHash::mh_hash($gif_image, 1, 2)),
+		"Got hash for a gif test image (in-memory) [$gif_image]"
+	);
+}
 
 done_testing();

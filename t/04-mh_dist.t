@@ -33,6 +33,4 @@ is(
     "Images are the same"
 );
 
-is(1, 1);
-
 done_testing();

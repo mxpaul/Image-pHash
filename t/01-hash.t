@@ -30,18 +30,18 @@ is(Image::pHash::hash($image_gif_path),
    "Got hash for a gif test image"
 );
 
-is(Image::pHash::hash_mem($image_jpg),
+is(Image::pHash::hash(\$image_jpg),
    Image::pHash::hash($image_jpg_path),
    "Got hash for an in-memory jpg test image"
 );
 
-is(Image::pHash::hash_mem($image_png),
+is(Image::pHash::hash(\$image_png),
    Image::pHash::hash($image_png_path),
    "Got hash for an in-memory png test image"
 );
 
 for my $gif_image (@gif_images) {
-   is(Image::pHash::hash_mem(util::read_file($gif_image)),
+   is(Image::pHash::hash(\util::read_file($gif_image)),
       Image::pHash::hash($gif_image),
       "Got hash for an in-memory gif test image [$gif_image]"
    );

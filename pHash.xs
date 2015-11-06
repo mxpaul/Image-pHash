@@ -264,20 +264,30 @@ double ph_hammingdistance2(uint8_t *hashA, int lenA, uint8_t *hashB, int lenB){
 MODULE = Image::pHash		PACKAGE = Image::pHash
 
 SV*
-hash(path)
-		char *path;
+hash(arg1)
+		SV *arg1;
 	PROTOTYPE: $
 	PPCODE:
 		ulong64 hash = 0;
 		int x = -1;
-
+		
 		try {
-			x = ph_dct_imagehash(path, hash);
-		}
-		catch( char * e ) {
+			if (SvROK(arg1)) {
+				// reading from memory
+				STRLEN na;
+				char *buf = (char*) SvPV(SvRV(arg1), na);
+				size_t buf_len = (size_t) na;
+				x = ph_dct_imagehash(buf, buf_len, hash);
+			} else if (SvPOK(arg1)) {
+				// reading from file
+				const char *path = SvPV_nolen(arg1);
+				x = ph_dct_imagehash(path, hash);
+			} else {
+				cwarn("argument has to be either a REF or a string");
+			}
+		} catch( char * e ) {
 			croak("Exception while ...: %s", e);
-		}
-		catch ( ... ) {
+		} catch ( ... ) {
 			croak("Exception while ...");
 		}
 		
@@ -352,8 +362,8 @@ dist(hs1,hs2)
 		}
 
 SV*
-mh_hash(path, param_alpha, param_level)
-		char *path;
+mh_hash(arg1, param_alpha, param_level)
+		SV *arg1;
 		double param_alpha;
 		double param_level;
 	PROTOTYPE: $$$
@@ -365,15 +375,25 @@ mh_hash(path, param_alpha, param_level)
 		level = (float)( param_level );
 
 		try {
-			hash = (char*)ph_mh_imagehash(path, hashlen, alpha, level);
-		}
-		catch( char * e ) {
+			if (SvROK(arg1)) {
+				// reading from memory
+				STRLEN na;
+				char *buf = (char*) SvPV(SvRV(arg1), na);
+				size_t buf_len = (size_t) na;
+				hash = (char*)ph_mh_imagehash(buf, buf_len, hashlen, alpha, level);
+			} else if (SvPOK(arg1)) {
+				// reading from file
+				const char *path = SvPV_nolen(arg1);
+				hash = (char*)ph_mh_imagehash(path, hashlen, alpha, level);
+			} else {
+				cwarn("argument has to be either a REF or a string");
+			}
+		} catch( char * e ) {
 			croak("Exception while ...: %s", e);
 			if ( hash ) {
 				free(hash);
 			}
-		}
-		catch ( ... ) {
+		} catch ( ... ) {
 			croak("Exception while ...");
 			if ( hash ) {
 				free(hash);
@@ -404,10 +424,10 @@ mh_hash_mem(buffer, param_alpha, param_level)
 		
 		STRLEN na;
 		char *buf = (char*) SvPV(buffer, na);
-		size_t size = (size_t) na;
+		size_t buf_len = (size_t) na;
 
 		try {
-			hash = (char*)ph_mh_imagehash(buf, size, hashlen, alpha, level);
+			hash = (char*)ph_mh_imagehash(buf, buf_len, hashlen, alpha, level);
 		}
 		catch( char * e ) {
 			croak("Exception while ...: %s", e);

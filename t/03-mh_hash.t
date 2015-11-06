@@ -36,17 +36,17 @@ is(unpack('H*',Image::pHash::mh_hash('test_images/image.gif', 1, 2)),
 
 
 
-is(unpack('H*', Image::pHash::mh_hash_mem(util::read_file('test_images/image.png'), 1, 2)),
+is(unpack('H*', Image::pHash::mh_hash(\util::read_file('test_images/image.png'), 1, 2)),
 	unpack('H*',Image::pHash::mh_hash('test_images/image.png', 1, 2)),
 	"Got hash for a png test image (in-memory)"
 );
 
-is(unpack('H*', Image::pHash::mh_hash_mem(util::read_file('test_images/image.jpg'), 1, 2)),
+is(unpack('H*', Image::pHash::mh_hash(\util::read_file('test_images/image.jpg'), 1, 2)),
 	unpack('H*',Image::pHash::mh_hash('test_images/image.jpg', 1, 2)),
 	"Got hash for a jpeg test image (in-memory)"
 );
 
-is(unpack('H*', Image::pHash::mh_hash_mem(util::read_file('test_images/1.gif'), 1, 2)),
+is(unpack('H*', Image::pHash::mh_hash(\util::read_file('test_images/1.gif'), 1, 2)),
 	unpack('H*',Image::pHash::mh_hash('test_images/1.gif', 1, 2)),
 	"Got hash for a gif test image (in-memory)"
 );

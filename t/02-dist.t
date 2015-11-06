@@ -29,7 +29,7 @@ is(
 is(
     Image::pHash::dist(
         Image::pHash::hash('test_images/image.gif'),
-        Image::pHash::hash_mem(util::read_file('test_images/image.gif')),
+        Image::pHash::hash(\util::read_file('test_images/image.gif')),
     ),
     0,
     "Images are the same"

@@ -94,8 +94,8 @@ namespace image_reader {
 			return NULL;
 		}
 		
-		CImg<T> *cimgData = new CImg<T>;
-		cimgData->assign();
+		CImgList<T> cimgList;
+		cimgList.assign();
 		
 		for (int i = 0; i < gif_file->ImageCount; ++i) {
 			SavedImage* img = &gif_file->SavedImages[i];
@@ -108,10 +108,6 @@ namespace image_reader {
 			
 			ExtensionBlock* gcb = NULL;
 			for (int i = 0; i < img->ExtensionBlockCount; ++i) {
-				// warn("block[%d]; function = %d", i, img->ExtensionBlocks[i].Function);
-				// for (int j = 0; j < img->ExtensionBlocks[i].ByteCount; ++j) {
-				// 	warn("\t[%d] = %x", j, img->ExtensionBlocks[i].Bytes[j]);
-				// }
 				if (img->ExtensionBlocks[i].Function == GRAPHICS_EXT_FUNC_CODE) {
 					gcb = &img->ExtensionBlocks[i];
 					break;
@@ -122,7 +118,7 @@ namespace image_reader {
 			if (is_alpha) {
 				transparent_color = gcb->Bytes[3];
 			}
-			warn("width = %d; height = %d; depth = %d; colors = %d; background = %d; is_alpha = %d, transparent_color = %d", width, height, depth, colors, background, is_alpha, transparent_color);
+			// warn("width = %d; height = %d; depth = %d; colors = %d; background = %d; is_alpha = %d, transparent_color = %d", width, height, depth, colors, background, is_alpha, transparent_color);
 			
 			CImg<T> frame_img;
 			frame_img.assign(width, height, 1, 3 + (is_alpha?1:0));
@@ -162,18 +158,18 @@ namespace image_reader {
 			}
 			
 			if (frame_img) {
-				frame_img.move_to(*cimgData);
+				frame_img.move_to(cimgList);
+				// cimgData->display();
 			}
 			
 		}
 		
 		if (!DGifCloseFile(gif_file)) {
 			cwarn("Error while closing a gif image. Error = %d", GifLastError());
-			delete cimgData;
 			return NULL;
 		}
 		
-		return cimgData;
+		return new CImg<T>(cimgList.get_append('z', 0));
 		
 #else
 		return NULL;

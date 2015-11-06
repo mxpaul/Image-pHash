@@ -1,5 +1,6 @@
 Changes
 CImg.h
+CImg155.h
 lib/Image/pHash.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -16,6 +17,7 @@ t/01-hash.t
 t/02-dist.t
 t/03-mh_hash.t
 t/04-mh_dist.t
+t/lib/util.pm
 test_images/1.gif
 test_images/2.gif
 test_images/200_s.gif

@@ -19,35 +19,35 @@ use util;
 
 
 
-# is(unpack('H*',Image::pHash::mh_hash('test_images/image.jpg', 1, 2)),
-#    '57098000000017e871602bc44079747b489c0010fbc0fe7539530406ca5f18fc96c817a072493596ed5cd91524924912667c0bdb22002148fa079f0102c9117ca3fb1fa18fe449be',
-#    "Got hash for a jpg test image"
-# );
+is(unpack('H*',Image::pHash::mh_hash('test_images/image.jpg', 1, 2)),
+   '57098000000017e871602bc44079747b489c0010fbc0fe7539530406ca5f18fc96c817a072493596ed5cd91524924912667c0bdb22002148fa079f0102c9117ca3fb1fa18fe449be',
+   "Got hash for a jpg test image"
+);
 
-# is(unpack('H*',Image::pHash::mh_hash('test_images/image.png', 1, 2)),
-#    '77c440000000001454203ba220000028a8ff00100a91105151fe000000080de2a3fc0000000000008b98100000000000000445cc080000000000000222e604000000000000011173',
-#    "Got hash for a png test image"
-# );
+is(unpack('H*',Image::pHash::mh_hash('test_images/image.png', 1, 2)),
+   '77c440000000001454203ba220000028a8ff00100a91105151fe000000080de2a3fc0000000000008b98100000000000000445cc080000000000000222e604000000000000011173',
+   "Got hash for a png test image"
+);
 
-# is(unpack('H*',Image::pHash::mh_hash('test_images/image.gif', 1, 2)),
-#    '00000000000810000000000000029bbc00000000001b70ddb40000000000091bb36c00000000001fe71f6c000000000013204c0400000000000dda2680000000000933357b4c4800',
-#    "Got hash for a gif test image"
-# );
+is(unpack('H*',Image::pHash::mh_hash('test_images/image.gif', 1, 2)),
+   '00000000000810000000000000029bbc00000000001b70ddb40000000000091bb36c00000000001fe71f6c000000000013204c0400000000000dda2680000000000933357b4c4800',
+   "Got hash for a gif test image"
+);
 
 
 
-# is(unpack('H*', Image::pHash::mh_hash_mem(util::read_file('test_images/image.png'), 1, 2)),
-# 	unpack('H*',Image::pHash::mh_hash('test_images/image.png', 1, 2)),
-# 	"Got hash for a png test image (in-memory)"
-# );
+is(unpack('H*', Image::pHash::mh_hash_mem(util::read_file('test_images/image.png'), 1, 2)),
+	unpack('H*',Image::pHash::mh_hash('test_images/image.png', 1, 2)),
+	"Got hash for a png test image (in-memory)"
+);
 
-# is(unpack('H*', Image::pHash::mh_hash_mem(util::read_file('test_images/image.jpg'), 1, 2)),
-# 	unpack('H*',Image::pHash::mh_hash('test_images/image.jpg', 1, 2)),
-# 	"Got hash for a jpeg test image (in-memory)"
-# );
+is(unpack('H*', Image::pHash::mh_hash_mem(util::read_file('test_images/image.jpg'), 1, 2)),
+	unpack('H*',Image::pHash::mh_hash('test_images/image.jpg', 1, 2)),
+	"Got hash for a jpeg test image (in-memory)"
+);
 
-is(unpack('H*', Image::pHash::mh_hash_mem(util::read_file('test_images/2.gif'), 1, 2)),
-	unpack('H*',Image::pHash::mh_hash('test_images/2.gif', 1, 2)),
+is(unpack('H*', Image::pHash::mh_hash_mem(util::read_file('test_images/1.gif'), 1, 2)),
+	unpack('H*',Image::pHash::mh_hash('test_images/1.gif', 1, 2)),
 	"Got hash for a gif test image (in-memory)"
 );
 

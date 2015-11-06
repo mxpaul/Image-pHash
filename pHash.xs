@@ -13,15 +13,15 @@ extern "C" {
 #endif
 
 #define cimg_debug 0
-#define cimg_display 1
+#define cimg_display 0
 #define cimg_use_png 1
 #define cimg_use_jpeg 1
 #define cimg_use_gif 1
 
 #define PNG_SKIP_SETJMP_CHECK
+#include "util/cwarn.h"
 #include "CImg.h"
 #include "readers/image_reader.h"
-#include "util/cwarn.h"
 using namespace cimg_library;
 using namespace image_reader;
 
@@ -155,7 +155,6 @@ CImg<float>* GetMHKernel(float alpha, float level){
 }
 
 uint8_t* ph_mh_imagehash(CImg<uint8_t> &src, int &N,float alpha, float lvl){
-	src.display();
 	CImg<uint8_t> img;
 
 	uint8_t *hash = (unsigned char*)malloc(72*sizeof(uint8_t));

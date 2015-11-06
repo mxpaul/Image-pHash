@@ -118,7 +118,7 @@ namespace image_reader {
 			if (is_alpha) {
 				transparent_color = gcb->Bytes[3];
 			}
-			// warn("width = %d; height = %d; depth = %d; colors = %d; background = %d; is_alpha = %d, transparent_color = %d", width, height, depth, colors, background, is_alpha, transparent_color);
+			// cwarn("width = %d; height = %d; depth = %d; colors = %d; background = %d; is_alpha = %d, transparent_color = %d", width, height, depth, colors, background, is_alpha, transparent_color);
 			
 			CImg<T> frame_img;
 			frame_img.assign(width, height, 1, 3 + (is_alpha?1:0));

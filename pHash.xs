@@ -182,9 +182,8 @@ uint8_t* ph_mh_imagehash(CImg<uint8_t> &src, int &N,float alpha, float lvl){
 	int bit_index = 0;
 	unsigned char hashbyte = 0;
 	for (int rindex=0;rindex < 31-2;rindex+=4){
-		CImg<float> subsec;
 		for (int cindex=0;cindex < 31-2;cindex+=4){
-			subsec = blocks.get_crop(cindex,rindex, cindex+2, rindex+2).unroll('x');
+			CImg<float> subsec = blocks.get_crop(cindex,rindex, cindex+2, rindex+2).unroll('x');
 			float ave = subsec.mean();
 			cimg_forX(subsec, I){
 				hashbyte <<= 1;

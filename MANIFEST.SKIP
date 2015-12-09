@@ -45,3 +45,10 @@ makerpm
 ^mockbuild\/repository
 ^mockbuild.yaml
 ^.idea/
+
+^third_party/CImg/examples/*
+^third_party/CImg/html/*
+^third_party/CImg/plugins/*
+^third_party/CImg/resources/*
+^third_party/CImg/Licence_*
+^third_party/CImg/README*

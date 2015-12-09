@@ -5,7 +5,6 @@ use ExtUtils::MakeMaker;
 my $release = $ENV{RELEASE} ? 1 : 0;
 
 my $define = $release ? '-O2 -g' : '-O0 -g';
-warn $define;
 
 WriteMakefile(
     NAME              => 'Image::pHash',
@@ -16,7 +15,7 @@ WriteMakefile(
        AUTHOR         => 'Vladimir Perepelitsa <v.perepelitsa@localdomain>') : ()),
     LIBS              => ['-L/usr/lib64/ -ljpeg -lpng -lgif -lstdc++'], # e.g., '-lm'
     DEFINE            => $define, # e.g., '-DHAVE_SOMETHING'
-    INC               => '-I. -I/usr/include/libpng12', # e.g., '-I. -I/usr/include/other'
+    INC               => '-I./third_party/CImg/ -I/usr/include/libpng12', # e.g., '-I. -I/usr/include/other'
 	# Un-comment this if you add C files to link with later:
     # OBJECT            => '$(O_FILES)', # link all the C files too
 	CC                => 'g++',

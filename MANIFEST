@@ -1,6 +1,4 @@
 Changes
-CImg.h
-CImg155.h
 lib/Image/pHash.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -24,4 +22,5 @@ test_images/200_s.gif
 test_images/image.gif
 test_images/image.jpg
 test_images/image.png
+third_party/CImg/CImg.h
 util/cwarn.h

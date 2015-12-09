@@ -1,0 +1,54 @@
+# Avoid version control files.
+\B\.git(?:ignore|modules|)\b
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.rpm$
+pHash.c
+pHash.o
+pHash.bs
+
+# Avoid Devel::Cover files.
+\bcover_db\b
+
+# Avoid local testing/dist files
+^MYMETA\.
+^libs/
+^dist/
+^makeall\.sh$
+^tmp/
+^Image-pHash-.*
+Kit\.pm$
+^xt/
+^ex/
+^topdir-
+makerpm
+^etc
+\.spec$
+^mockbuild\/repository
+^mockbuild.yaml
+^.idea/
+
+^third_party/CImg/examples/*
+^third_party/CImg/html/*
+^third_party/CImg/plugins/*
+^third_party/CImg/resources/*
+^third_party/CImg/Licence_*
+^third_party/CImg/README*

@@ -1,0 +1,24 @@
+language: perl
+os:
+  - linux
+  # - osx
+perl:
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+  - "5.10"
+matrix:
+  allow_failures:
+    - os: osx
+notifications:
+  email: false
+  
+before_install:
+  - sudo apt-get update -q
+  - sudo apt-get install -y libjpeg8 libjpeg8-dev libpng3 libpng12-dev libpng3 libpng12-dev libgif4 libgif-dev graphicsmagick-imagemagick-compat
+install:
+  - cpanm Data::Dumper
+  - cpanm Test::More
+  

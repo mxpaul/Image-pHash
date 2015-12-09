@@ -47,7 +47,9 @@ is(unpack('H*', Image::pHash::mh_hash(\util::read_file('test_images/image.jpg'),
 );
 
 for my $gif_image (@gif_images) {
-	is(unpack('H*', Image::pHash::mh_hash(\util::read_file($gif_image), 1, 2)),
+	my $mem_h = unpack('H*', Image::pHash::mh_hash(\util::read_file($gif_image), 1, 2));
+	warn "Got this hash for $gif_image: $mem_h";
+	is($mem_h,
 		unpack('H*',Image::pHash::mh_hash($gif_image, 1, 2)),
 		"Got hash for a gif test image (in-memory) [$gif_image]"
 	);

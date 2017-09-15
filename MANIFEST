@@ -1,3 +1,4 @@
+.travis.yml
 Changes
 lib/Image/pHash.pm
 Makefile.PL
@@ -15,6 +16,8 @@ t/01-hash.t
 t/02-dist.t
 t/03-mh_hash.t
 t/04-mh_dist.t
+t/05_gif_colormap.t
+t/data/no_global_colormap.gif
 t/lib/util.pm
 test_images/1.gif
 test_images/2.gif
